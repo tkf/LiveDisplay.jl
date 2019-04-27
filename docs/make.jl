@@ -9,7 +9,6 @@ makedocs(;
     repo="https://github.com/tkf/LiveDisplay.jl/blob/{commit}{path}#L{line}",
     sitename="LiveDisplay.jl",
     authors="Takafumi Arakaki",
-    assets=[],
 )
 
 deploydocs(;
