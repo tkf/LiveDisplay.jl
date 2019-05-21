@@ -1,6 +1,6 @@
 module LiveDisplay
 
-export @livedocs
+export @livedocs, liveinclude
 
 using Base.Docs: doc
 using Markdown
@@ -16,10 +16,26 @@ asdoc(path::AbstractString) = Markdown.parse_file(path)
 calldisplay(::Nothing, x) = display(x)
 calldisplay(f, x) = f(x)
 
+function _live(f, thing)
+    f()
+    entr(f, watchables(thing)...)
+end
+
 function livedocs(thing; display=nothing)
-    calldisplay(display, asdoc(thing))
-    entr(watchables(thing)...) do
+    _live(thing) do
         calldisplay(display, asdoc(thing))
+    end
+end
+
+"""
+    liveinclude([module,] path; display=nothing)
+
+Include `path` to `module` (default: `Main`) everytime it is updated.
+"""
+liveinclude(path; kwargs...) = liveinclude(Main, path; kwargs...)
+function liveinclude(namespace, path; display=nothing)
+    _live(path) do
+        calldisplay(display, Base.include(namespace, path))
     end
 end
 
