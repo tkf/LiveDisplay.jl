@@ -15,6 +15,11 @@ asdoc(path::AbstractString) = Markdown.parse_file(path)
 
 calldisplay(::Nothing, x) = display(x)
 calldisplay(f, x) = f(x)
+function calldisplay(fs::Vector, x)
+    for f in fs
+        calldisplay(f, x)
+    end
+end
 
 function _live(f, thing)
     f()
@@ -31,6 +36,11 @@ end
     liveinclude([module,] path; display=nothing)
 
 Include `path` to `module` (default: `Main`) everytime it is updated.
+
+# Keyword Arguments
+- `display`: A callable that accepts one argument or a `Vector` of
+  such callables.  The object returned from `include(path)` is passed
+ to it/them.
 """
 liveinclude(path; kwargs...) = liveinclude(Main, path; kwargs...)
 function liveinclude(namespace, path; display=nothing)
@@ -48,6 +58,10 @@ Display THING using FUNCTION (default to `display`) where THING can be:
 
 * Julia object with docstring.
 * Path to markdown file.
+
+FUNCTION must be a callable that accepts an object returned by
+`Base.Docs.doc` (typically a `Markdown.MD`) or a `Vector` of such
+callables.
 
 # Examples
 ```julia-repl
